@@ -2,13 +2,15 @@ import fs from "fs";
 import path from "path";
 import url from "url";
 
-import cookiesParser from "cookie-parser";
+import cookieParser from "cookie-parser";
 import express from "express";
 import morgan from "morgan";
 import cors from "cors";
 
 const __filename = url.fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+const publicPath = path.join(process.cwd(), "public");
 
 const api = express();
 
@@ -17,12 +19,8 @@ api.set("port", 8000);
 api.use(morgan("dev"));
 api.use(cors());
 api.use(express.json());
-api.use(cookiesParser());
-api.use(express.static("public"));
-
-api.get("/", (req, res) => {
-  res.send("<h1>minotaes backend is running ✅</h1>");
-});
+api.use(cookieParser());
+api.use(express.static(publicPath));
 
 const resourcesPath = path.join(__dirname, "resources");
 try {
