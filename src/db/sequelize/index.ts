@@ -1,5 +1,5 @@
 import { Sequelize } from "sequelize";
-import { ENV } from "../../../env.js";
+import { ENV } from "../../env.js";
 
 const { DATABASE, USERNAME, PASSWORD, HOST, PORT, DIALECT } = ENV.DB.SEQUELIZE;
 
