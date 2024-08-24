@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>minota.es</title>
+  </head>
+  <body>
+    <h1>App is running 🎶</h1>
+    <code id="console"> </code>
+    <script>
+      const consoleElement = document.getElementById("console");
+      consoleElement.innerHTML = "Loading...";
+
+      fetch("/api/ping")
+        .then((response) => response.json())
+        .then((data) => {
+          consoleElement.innerHTML = JSON.stringify(data, null, 2);
+        })
+        .catch((error) => {
+          consoleElement.innerHTML = error.message;
+        });
+    </script>
+  </body>
+</html>

@@ -1,5 +1,6 @@
+import { ENV } from "./config/env.js";
 import { api } from "./api/index.js";
 
-api.listen(8000, () => {
-  console.log("Server is running on port 8000");
+api.listen(ENV.SERVER.PORT, () => {
+  console.log("Server is running on port: ", ENV.SERVER.PORT);
 });
