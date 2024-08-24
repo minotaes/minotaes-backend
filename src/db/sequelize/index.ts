@@ -1,12 +1,12 @@
 import { Sequelize } from "sequelize";
-import { ENV } from "../../env.js";
+import { ENV } from "../../config/env.js";
 
-const { DATABASE, USERNAME, PASSWORD, HOST, PORT, DIALECT } = ENV.DB.SEQUELIZE;
+const { DATABASE, USERNAME, PASSWORD, HOST, PORT } = ENV.DB;
 
 export const sequelize = new Sequelize(DATABASE, USERNAME, PASSWORD, {
   host: HOST,
   port: PORT,
-  dialect: DIALECT,
+  dialect: "mariadb",
   logging: false,
 });
 
