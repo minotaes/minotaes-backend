@@ -2,6 +2,10 @@ import { Router } from "express";
 
 export const router = Router();
 
-router.get("/", (req, res) => {
-  res.json({ message: "pong" });
-});
+export const createRouter = () => {
+  router.get("/", (req, res) => {
+    res.json({ message: "pong" });
+  });
+
+  return router;
+};

@@ -12,3 +12,9 @@ declare namespace Express {
     authenticated: boolean;
   }
 }
+
+interface ProjectDependencies {
+  models: {
+    user: UserRepository;
+  };
+}
