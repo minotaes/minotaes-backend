@@ -4,6 +4,13 @@ interface User {
   password: string;
 }
 
+type UserAttribute = keyof User;
+
+interface UserOptionsModel {
+  where: Partial<User>;
+  attributes: UserAttribute[] | { exclude: UserAttribute[] };
+}
+
 interface UserRepository {
-  findByEmail: (email: string) => Promise<User | null>;
+  findOne: (options: UserOptionsModel) => Promise<User | null>;
 }
