@@ -5,7 +5,7 @@ type Result<D> =
   | { success: false; details: Record<string, string> };
 
 export const validateSchema =
-  (schema: AnyZodObject) =>
+  <S extends AnyZodObject>(schema: S) =>
   (data: any): Result<z.infer<typeof schema>> => {
     try {
       schema.parse(data);
