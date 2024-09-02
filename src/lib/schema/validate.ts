@@ -1,7 +1,12 @@
 import { ZodError, type z, type AnyZodObject } from "zod";
 
+type Result<D> =
+  | { success: true; data: D }
+  | { success: false; details: Record<string, string> };
+
 export const validateSchema =
-  (schema: AnyZodObject) => (data: z.infer<typeof schema>) => {
+  (schema: AnyZodObject) =>
+  (data: any): Result<z.infer<typeof schema>> => {
     try {
       schema.parse(data);
 
