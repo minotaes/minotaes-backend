@@ -14,6 +14,7 @@ export class Users extends Model<
   declare userId: string;
   declare email: string;
   declare password: CreationOptional<string>;
+  declare lastSessionTokenCreatedAt: CreationOptional<number>;
 }
 
 Users.init(
@@ -31,6 +32,11 @@ Users.init(
     password: {
       type: DataTypes.STRING,
       allowNull: true,
+    },
+    lastSessionTokenCreatedAt: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 0,
     },
   },
   {

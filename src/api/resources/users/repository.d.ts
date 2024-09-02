@@ -2,6 +2,7 @@ interface User {
   userId: string;
   email: string;
   password?: string;
+  lastSessionTokenCreatedAt?: number;
 }
 
 type UserAttribute = keyof User;
