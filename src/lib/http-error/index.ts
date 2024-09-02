@@ -38,3 +38,9 @@ export class NotFoundError extends HTTPError {
     super({ status: 404, ...options });
   }
 }
+
+export class ConflictError extends HTTPError {
+  constructor(options: HTTPErrorOptions) {
+    super({ status: 409, ...options });
+  }
+}
