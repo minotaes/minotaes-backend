@@ -1,10 +1,12 @@
 import { Users as UserRepo } from "../schemas/index.js";
+import { sequelizeErrorHandler } from "../utils/error-handler.js";
 
 export class UserModel implements UserRepository {
   async create(options: User) {
-    const user = await UserRepo.create(options);
-
-    return user as User;
+    return await sequelizeErrorHandler(async () => {
+      const user = await UserRepo.create(options);
+      return user as User;
+    });
   }
 
   async findOne(options: UserOptionsModel) {
