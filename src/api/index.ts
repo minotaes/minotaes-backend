@@ -7,8 +7,6 @@ import express from "express";
 import morgan from "morgan";
 import cors from "cors";
 
-import { type ProjectDependencies } from "types.js";
-
 const __filename = url.fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
