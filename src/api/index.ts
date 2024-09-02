@@ -7,6 +7,8 @@ import express from "express";
 import morgan from "morgan";
 import cors from "cors";
 
+import { type ProjectDependencies } from "types.js";
+
 const __filename = url.fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -23,7 +25,8 @@ api.use(cookieParser());
 api.use(express.static(publicPath));
 
 const resourcesPath = path.join(__dirname, "resources");
-try {
+
+const createEndpoints = (deps: ProjectDependencies) => {
   const resources = fs.readdirSync(resourcesPath);
 
   for (const resource of resources) {
@@ -32,16 +35,16 @@ try {
     const URL = url.pathToFileURL(routerPath).href;
 
     import(URL)
-      .then(({ router }) => {
+      .then(({ createRouter }) => {
         console.log(`Imported ${resource}`);
-        api.use(`/api/${resource}`, router);
+
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+        api.use(`/api/${resource}`, createRouter(deps));
       })
       .catch((error) => {
         console.error(`Error importing ${resource}: ${error.message}`);
       });
   }
-} catch (error: any) {
-  console.error(`Error reading resources directory: ${error.message}`);
-}
+};
 
-export { api };
+export { api, createEndpoints };
