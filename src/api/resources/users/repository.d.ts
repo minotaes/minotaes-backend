@@ -1,7 +1,7 @@
 interface User {
   userId: string;
   email: string;
-  password: string;
+  password?: string;
 }
 
 type UserAttribute = keyof User;
