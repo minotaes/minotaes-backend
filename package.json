@@ -9,6 +9,14 @@
     "dev": "concurrently \"tsc -w\"  \"node --watch --env-file .env.local dist/index.js\"",
     "dev:prod": "concurrently \"tsc -w\"  \"node --watch --env-file .env dist/index.js\""
   },
+  "imports": {
+    "#root/*": "./dist/*",
+    "#api/*": "./dist/api/*",
+    "#config/*": "./dist/config/*",
+    "#db/*": "./dist/db/*",
+    "#lib/*": "./dist/lib/*",
+    "#utils/*": "./dist/utils/*"
+  },
   "keywords": [],
   "author": "minotaes",
   "license": "ISC",
