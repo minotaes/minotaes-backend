@@ -15,7 +15,8 @@
     "#config/*": "./dist/config/*",
     "#db/*": "./dist/db/*",
     "#lib/*": "./dist/lib/*",
-    "#utils/*": "./dist/utils/*"
+    "#utils/*": "./dist/utils/*",
+    "#constants/*": "./dist/constants/*"
   },
   "keywords": [],
   "author": "minotaes",
