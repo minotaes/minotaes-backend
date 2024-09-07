@@ -1,11 +1,8 @@
 import { z } from "zod";
-import {
-  passwordSchema,
-  validateSchema,
-} from "../../../../lib/schema/index.js";
-import { NotFoundError } from "../../../../lib/http-error/index.js";
-import { isNullish } from "../../../../utils/check.js";
-import { controllerHandler } from "../../../middleware/index.js";
+import { passwordSchema, validateSchema } from "#lib/schema/index.js";
+import { NotFoundError } from "#lib/http-error/index.js";
+import { isNullish } from "#utils/check.js";
+import { controllerHandler } from "#api/middleware/index.js";
 
 const sh = z.object({
   body: z.object({
