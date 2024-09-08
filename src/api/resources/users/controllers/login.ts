@@ -1,12 +1,20 @@
 import { z } from "zod";
-import { passwordSchema, validateSchema } from "#lib/schema/index.js";
-import { NotFoundError } from "#lib/http-error/index.js";
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
+
+import {
+  emailSchema,
+  passwordSchema,
+  validateSchema,
+} from "#lib/schema/index.js";
+import { UnauthorizedError } from "#lib/http-error/index.js";
 import { isNullish } from "#utils/check.js";
 import { controllerHandler } from "#api/middleware/index.js";
+import { ENV } from "#root/config/env.js";
 
 const sh = z.object({
   body: z.object({
-    email: z.string().email(),
+    email: emailSchema,
     password: passwordSchema,
   }),
 });
@@ -20,20 +28,29 @@ export const loginController = controllerHandler(
       where: {
         email: attrs.body.email,
       },
-      attributes: ["password"],
+      attributes: ["userId", "password"],
     });
 
-    if (isNullish(user)) {
-      throw new NotFoundError({
-        message: `Email ${attrs.body.email} not found.`,
+    const isEqual = await bcrypt.compare(
+      attrs.body.password,
+      user?.password ?? "",
+    );
+
+    if (isNullish(user) || !isEqual) {
+      throw new UnauthorizedError({
+        message: "Credenciales inválidas",
         details: {},
       });
     }
 
+    const token = jwt.sign({ u: user.userId }, ENV.SECRETS.JWT, {
+      expiresIn: "30d",
+    });
+
     return {
       status: 200,
       body: {
-        message: "Login exitoso",
+        token,
       },
     };
   },
