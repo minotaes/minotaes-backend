@@ -10,6 +10,6 @@ export const ENV = {
     PORT: Number(process.env.SERVER_PORT ?? 3000),
   },
   SECRETS: {
-    JWT: process.env.JWT_SECRET ?? "",
-  }
+    JWT: process.env.SECRET_JWT ?? "",
+  },
 };
