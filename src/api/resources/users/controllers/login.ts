@@ -43,7 +43,7 @@ export const loginController = controllerHandler(
       });
     }
 
-    const token = jwt.sign({ u: user.userId }, ENV.SECRETS.JWT, {
+    const token = jwt.sign({ u: user.userId }, ENV.SERVER.JWT, {
       expiresIn: "30d",
     });
 

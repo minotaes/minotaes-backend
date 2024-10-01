@@ -31,7 +31,7 @@ export const registerController = controllerHandler(
       email: attrs.body.email,
     });
 
-    const token = jwt.sign({ u: userId }, ENV.SECRETS.JWT, {
+    const token = jwt.sign({ u: userId }, ENV.SERVER.JWT, {
       expiresIn: "30d",
     });
 
@@ -42,7 +42,7 @@ export const registerController = controllerHandler(
         return;
       }
 
-      const tokenPayload = jwt.verify(token, ENV.SECRETS.JWT) as any;
+      const tokenPayload = jwt.verify(token, ENV.SERVER.JWT) as any;
 
       deps.models.user
         .update(
