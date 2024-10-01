@@ -6,7 +6,10 @@ export const stringSchema = z.string({
   invalid_type_error: DETAILS.EXPECTED_STRING,
 });
 
-export const emailSchema = stringSchema.email(DETAILS.INVALID_EMAIL);
+export const emailSchema = stringSchema
+  .email(DETAILS.INVALID)
+  .min(5, { message: DETAILS.TOO_SHORT })
+  .max(100, { message: DETAILS.TOO_LONG });
 export const passwordSchema = stringSchema
-  .min(6, { message: DETAILS.PASSWORD_TOO_SHORT })
-  .max(20, { message: DETAILS.PASSWORD_TOO_LONG });
+  .min(6, { message: DETAILS.TOO_SHORT })
+  .max(20, { message: DETAILS.TOO_LONG });
