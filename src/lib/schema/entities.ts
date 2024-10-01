@@ -1,7 +1,7 @@
 import { DETAILS } from "#constants/details.js";
 import { z } from "zod";
 
-const stringSchema = z.string({
+export const stringSchema = z.string({
   required_error: DETAILS.REQUIRED,
   invalid_type_error: DETAILS.EXPECTED_STRING,
 });
