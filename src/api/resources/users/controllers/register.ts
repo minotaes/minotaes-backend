@@ -1,7 +1,6 @@
 import crypto from "node:crypto";
 
 import { z } from "zod";
-import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 
 import { controllerHandler } from "#api/middleware/index.js";
@@ -10,10 +9,10 @@ import {
   stringSchema,
   validateSchema,
 } from "#lib/schema/index.js";
-import { ENV } from "#config/env.js";
 import { isNullish } from "#root/utils/check.js";
 import { DETAILS } from "#root/constants/details.js";
 import { BadRequestError } from "#root/lib/http-error/index.js";
+import { createJWT, decodeJWT, verifyJWT } from "#root/lib/jwt/index.js";
 
 const requestSchema = z.object({
   body: z.object({
@@ -27,16 +26,7 @@ export const registerController = controllerHandler(
     test: validateSchema(requestSchema),
   },
   async ({ attrs, deps }) => {
-    let email: string | undefined;
-
-    try {
-      const decoded = jwt.verify(attrs.body.token, ENV.SERVER.JWT) as {
-        e: string;
-      };
-      email = decoded.e;
-    } catch (error) {
-      console.error(error);
-    }
+    const email = verifyJWT<{ e: string }>(attrs.body.token)?.e;
 
     if (isNullish(email)) {
       throw new BadRequestError({
@@ -52,9 +42,7 @@ export const registerController = controllerHandler(
       email,
     });
 
-    const token = jwt.sign({ u: userId }, ENV.SERVER.JWT, {
-      expiresIn: "30d",
-    });
+    const token = createJWT({ expiresIn: "30d" }, { i: userId });
 
     bcrypt.hash(attrs.body.password, 10, function (err, hash) {
       if (err instanceof Error) {
@@ -63,7 +51,7 @@ export const registerController = controllerHandler(
         return;
       }
 
-      const tokenPayload = jwt.verify(token, ENV.SERVER.JWT) as any;
+      const tokenPayload = decodeJWT<{ iat: number }>(attrs.body.token);
 
       deps.models.user
         .update(

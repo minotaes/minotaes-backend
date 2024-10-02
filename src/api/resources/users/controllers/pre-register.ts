@@ -1,11 +1,10 @@
 import { z } from "zod";
-import jwt from "jsonwebtoken";
 
 import { controllerHandler } from "#api/middleware/index.js";
 import { emailSchema, validateSchema } from "#lib/schema/index.js";
 import { isNullish } from "#root/utils/check.js";
-import { ENV } from "#config/env.js";
 import { sendRegisterEmail } from "#root/lib/email/index.js";
+import { createJWT } from "#root/lib/jwt/index.js";
 
 const requestSchema = z.object({
   body: z.object({
@@ -32,9 +31,7 @@ export const preRegisterController = controllerHandler(
       };
     }
 
-    const token = jwt.sign({ e: attrs.body.email }, ENV.SERVER.JWT, {
-      expiresIn: "6m",
-    });
+    const token = createJWT({ expiresIn: "6m" }, { e: attrs.body.email });
 
     await sendRegisterEmail({
       to: attrs.body.email,

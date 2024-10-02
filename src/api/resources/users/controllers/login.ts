@@ -1,6 +1,5 @@
 import { z } from "zod";
 import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
 
 import {
   emailSchema,
@@ -10,7 +9,7 @@ import {
 import { UnauthorizedError } from "#lib/http-error/index.js";
 import { isNullish } from "#utils/check.js";
 import { controllerHandler } from "#api/middleware/index.js";
-import { ENV } from "#root/config/env.js";
+import { createJWT } from "#root/lib/jwt/index.js";
 
 const sh = z.object({
   body: z.object({
@@ -43,9 +42,7 @@ export const loginController = controllerHandler(
       });
     }
 
-    const token = jwt.sign({ u: user.userId }, ENV.SERVER.JWT, {
-      expiresIn: "30d",
-    });
+    const token = createJWT({ expiresIn: "30d" }, { i: user.userId });
 
     return {
       status: 200,
