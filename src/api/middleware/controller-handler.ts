@@ -1,4 +1,9 @@
-import { type NextFunction, type Request, type Response } from "express";
+import {
+  type RequestHandler,
+  type NextFunction,
+  type Request,
+  type Response,
+} from "express";
 import { HTTPError } from "../../lib/http-error/index.js";
 import { authenticate } from "./authenticate.js";
 import { type User as UserR } from "../resources/users/repository.js";
@@ -44,67 +49,67 @@ export const controllerHandler =
     controller: Controller<R, A, User>,
   ) =>
   (deps: ProjectDependencies) =>
-  async (req: Request, res: Response, next: NextFunction) => {
-    let user: any;
+    (async (req: Request, res: Response, next: NextFunction) => {
+      let user: any;
 
-    // AUTHENTICATION
-    if (options.auth === true) {
-      const authResult = authenticate(req);
-      if (!authResult.success) {
-        res.status(401).json({
-          message: authResult.message,
-          details: authResult.details,
-        });
-
-        return;
-      }
-
-      user = await deps.models.user
-        .findOne({
-          where: { userId: authResult.data },
-          attributes: options.user,
-        })
-        .catch(() => undefined);
-    }
-
-    const reqResult = options.test?.(req) ?? {
-      success: true,
-      data: null as R,
-    };
-
-    if (!reqResult.success) {
-      res.status(400).json({
-        message: "Request is not valid",
-        details: reqResult.details,
-      });
-
-      return;
-    }
-
-    controller({
-      user,
-      attrs: reqResult.data,
-      deps,
-    })
-      .then((response) => {
-        res.status(response.status).json(response.body);
-      })
-      .catch((err) => {
-        if (!(err instanceof HTTPError)) {
-          console.error(err);
-
-          res.status(500).json({
-            message: "Something went wrong, please try again later",
-            details: {},
+      // AUTHENTICATION
+      if (options.auth === true) {
+        const authResult = authenticate(req);
+        if (!authResult.success) {
+          res.status(401).json({
+            message: authResult.message,
+            details: authResult.details,
           });
 
           return;
         }
 
-        // TODO: not send err to client
-        res.status(err.status).json({
-          message: err.message,
-          details: err.details,
+        user = await deps.models.user
+          .findOne({
+            where: { userId: authResult.data },
+            attributes: options.user,
+          })
+          .catch(() => undefined);
+      }
+
+      const reqResult = options.test?.(req) ?? {
+        success: true,
+        data: null as R,
+      };
+
+      if (!reqResult.success) {
+        res.status(400).json({
+          message: "Request is not valid",
+          details: reqResult.details,
         });
-      });
-  };
+
+        return;
+      }
+
+      controller({
+        user,
+        attrs: reqResult.data,
+        deps,
+      })
+        .then((response) => {
+          res.status(response.status).json(response.body);
+        })
+        .catch((err) => {
+          if (!(err instanceof HTTPError)) {
+            console.error(err);
+
+            res.status(500).json({
+              message: "Something went wrong, please try again later",
+              details: {},
+            });
+
+            return;
+          }
+
+          // TODO: not send err to client
+          res.status(err.status).json({
+            message: err.message,
+            details: err.details,
+          });
+        });
+    }) as RequestHandler;
