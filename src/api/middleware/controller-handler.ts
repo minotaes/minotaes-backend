@@ -1,5 +1,7 @@
 import { type NextFunction, type Request, type Response } from "express";
 import { HTTPError } from "../../lib/http-error/index.js";
+import { authenticate } from "./authenticate.js";
+import { type User as UserR } from "../resources/users/repository.js";
 
 interface RequestSchema {
   params: any;
@@ -17,7 +19,8 @@ enum SuccessHTTPStatus {
   MULTI_STATUS = 207,
 }
 
-type Controller<R> = (props: {
+type Controller<R, Auth, User extends Array<keyof UserR>> = (props: {
+  user: Auth extends true ? { [key in User[number]]: UserR[key] } : undefined;
   attrs: R;
   deps: ProjectDependencies;
 }) => Promise<{
@@ -25,18 +28,45 @@ type Controller<R> = (props: {
   body: any;
 }>;
 
-interface Options<R> {
+interface Options<R, Auth, User> {
   test?: (
     req: RequestSchema,
   ) =>
     | { success: true; data: R }
     | { success: false; details: Record<string, any> };
+  auth?: Auth;
+  user?: Auth extends true ? User : undefined;
 }
 
 export const controllerHandler =
-  <R>(options: Options<R>, controller: Controller<R>) =>
+  <R, A extends true, User extends Array<keyof UserR>>(
+    options: Options<R, A, User>,
+    controller: Controller<R, A, User>,
+  ) =>
   (deps: ProjectDependencies) =>
-  (req: Request, res: Response, next: NextFunction) => {
+  async (req: Request, res: Response, next: NextFunction) => {
+    let user: any;
+
+    // AUTHENTICATION
+    if (options.auth === true) {
+      const authResult = authenticate(req);
+      if (!authResult.success) {
+        res.status(401).json({
+          message: authResult.message,
+          details: authResult.details,
+        });
+
+        return;
+      }
+
+      user = await deps.models.user
+        .findOne({
+          where: { userId: authResult.data },
+          attributes: options.user,
+        })
+        .catch(() => undefined);
+    }
+
     const reqResult = options.test?.(req) ?? {
       success: true,
       data: null as R,
@@ -52,6 +82,7 @@ export const controllerHandler =
     }
 
     controller({
+      user,
       attrs: reqResult.data,
       deps,
     })
