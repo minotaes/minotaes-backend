@@ -6,7 +6,6 @@ import {
 } from "express";
 import { HTTPError } from "../../lib/http-error/index.js";
 import { authenticate } from "./authenticate.js";
-import { type User as UserR } from "../resources/users/repository.js";
 
 interface RequestSchema {
   params: any;
@@ -24,8 +23,8 @@ enum SuccessHTTPStatus {
   MULTI_STATUS = 207,
 }
 
-type Controller<R, Auth, User extends Array<keyof UserR>> = (props: {
-  user: Auth extends true ? { [key in User[number]]: UserR[key] } : undefined;
+type Controller<R, Auth, U extends Array<keyof User>> = (props: {
+  user: Auth extends true ? { [key in U[number]]: User[key] } : undefined;
   attrs: R;
   deps: ProjectDependencies;
 }) => Promise<{
@@ -33,20 +32,20 @@ type Controller<R, Auth, User extends Array<keyof UserR>> = (props: {
   body: any;
 }>;
 
-interface Options<R, Auth, User> {
+interface Options<R, Auth, U> {
   test?: (
     req: RequestSchema,
   ) =>
     | { success: true; data: R }
     | { success: false; details: Record<string, any> };
   auth?: Auth;
-  user?: Auth extends true ? User : undefined;
+  user?: Auth extends true ? U : undefined;
 }
 
 export const controllerHandler =
-  <R, A extends true, User extends Array<keyof UserR>>(
-    options: Options<R, A, User>,
-    controller: Controller<R, A, User>,
+  <R, A extends true, U extends Array<keyof User>>(
+    options: Options<R, A, U>,
+    controller: Controller<R, A, U>,
   ) =>
   (deps: ProjectDependencies) =>
     (async (req: Request, res: Response, next: NextFunction) => {
@@ -67,7 +66,7 @@ export const controllerHandler =
         user = await deps.models.user
           .findOne({
             where: { userId: authResult.data },
-            attributes: options.user,
+            attributes: options.user ?? ["userId"],
           })
           .catch(() => undefined);
       }
