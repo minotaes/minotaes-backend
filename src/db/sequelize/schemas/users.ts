@@ -11,9 +11,10 @@ export class Users extends Model<
   InferAttributes<Users>,
   InferCreationAttributes<Users>
 > {
-  declare userId: CreationOptional<number>;
+  declare userId: string;
   declare email: string;
-  declare password: string;
+  declare password: CreationOptional<string>;
+  declare lastSessionTokenCreatedAt: CreationOptional<number>;
 }
 
 Users.init(
@@ -22,7 +23,6 @@ Users.init(
       type: DataTypes.INTEGER,
       primaryKey: true,
       allowNull: false,
-      autoIncrement: true,
     },
     email: {
       type: DataTypes.STRING,
@@ -31,7 +31,12 @@ Users.init(
     },
     password: {
       type: DataTypes.STRING,
+      allowNull: true,
+    },
+    lastSessionTokenCreatedAt: {
+      type: DataTypes.INTEGER,
       allowNull: false,
+      defaultValue: 0,
     },
   },
   {

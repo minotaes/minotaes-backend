@@ -1,7 +1,8 @@
-interface User {
+export interface User {
   userId: string;
   email: string;
-  password: string;
+  password?: string;
+  lastSessionTokenCreatedAt?: number;
 }
 
 type UserAttribute = keyof User;
@@ -11,6 +12,15 @@ interface UserOptionsModel {
   attributes: UserAttribute[] | { exclude: UserAttribute[] };
 }
 
+interface UserUpdateOptionsModel {
+  where: Partial<User>;
+}
+
 interface UserRepository {
+  create: (data: User) => Promise<User>;
   findOne: (options: UserOptionsModel) => Promise<User | null>;
+  update: (
+    data: Partial<User>,
+    options: UserUpdateOptionsModel,
+  ) => Promise<void>;
 }

@@ -1,15 +1,19 @@
 import { z } from "zod";
+import bcrypt from "bcrypt";
+
 import {
+  emailSchema,
   passwordSchema,
   validateSchema,
-} from "../../../../lib/schema/index.js";
-import { NotFoundError } from "../../../../lib/http-error/index.js";
-import { isNullish } from "../../../../utils/check.js";
-import { controllerHandler } from "../../../middleware/index.js";
+} from "#lib/schema/index.js";
+import { UnauthorizedError } from "#lib/http-error/index.js";
+import { isNullish } from "#utils/check.js";
+import { controllerHandler } from "#api/middleware/index.js";
+import { createJWT } from "#root/lib/jwt/index.js";
 
 const sh = z.object({
   body: z.object({
-    email: z.string().email(),
+    email: emailSchema,
     password: passwordSchema,
   }),
 });
@@ -23,20 +27,27 @@ export const loginController = controllerHandler(
       where: {
         email: attrs.body.email,
       },
-      attributes: ["password"],
+      attributes: ["userId", "password"],
     });
 
-    if (isNullish(user)) {
-      throw new NotFoundError({
-        message: `Email ${attrs.body.email} not found.`,
+    const isEqual = await bcrypt.compare(
+      attrs.body.password,
+      user?.password ?? "",
+    );
+
+    if (isNullish(user) || !isEqual) {
+      throw new UnauthorizedError({
+        message: "Credenciales inválidas",
         details: {},
       });
     }
 
+    const token = createJWT({ expiresIn: "30d" }, { i: user.userId });
+
     return {
       status: 200,
       body: {
-        message: "Login exitoso",
+        token,
       },
     };
   },

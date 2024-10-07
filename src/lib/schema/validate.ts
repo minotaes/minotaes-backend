@@ -25,7 +25,7 @@ export const validateSchema =
       const parsed = err.issues.reduce(
         (acc, { path, message }) => ({
           ...acc,
-          [`${path.join(".")}`]: message,
+          [`${path[path.length - 1]}`]: message,
         }),
         {},
       );
