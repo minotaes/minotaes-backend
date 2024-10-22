@@ -1,3 +1,7 @@
+import dotenv from "dotenv";
+
+dotenv.config();
+
 export const ENV = {
   DB: {
     HOST: process.env.DB_HOST ?? "",
