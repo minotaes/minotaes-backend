@@ -6,7 +6,7 @@ const { DATABASE, USERNAME, PASSWORD, HOST, PORT } = ENV.DB;
 export const sequelize = new Sequelize(DATABASE, USERNAME, PASSWORD, {
   host: HOST,
   port: PORT,
-  dialect: "mariadb",
+  dialect: "postgres",
   logging: false,
 });
 
