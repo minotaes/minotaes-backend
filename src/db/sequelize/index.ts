@@ -10,9 +10,9 @@ export const sequelize = new Sequelize(DATABASE, USERNAME, PASSWORD, {
   logging: false,
 });
 
-export async function connectDatabase() {
-  await sequelize.sync({ force: false, alter: false });
+await sequelize.sync({ force: false, alter: false });
 
+export function connectDatabase() {
   sequelize
     .authenticate()
     .then(() => {
